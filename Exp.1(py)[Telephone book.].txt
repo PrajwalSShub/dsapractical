@@ -1,0 +1,197 @@
+class Record:
+    def __init__(self):
+        self._name = None
+        self._number = None
+
+    def get_name(self):
+        return self._name
+
+    def get_number(self):
+        return self._number
+
+    def set_name(self, name):
+        self._name = name
+
+    def set_number(self, number):
+        self._number = number
+
+    def __str__(self):
+        return f"Name: {self._name}\t\tNumber: {self._number}"
+
+
+class LinearProbingHashTable:
+    def __init__(self, size):
+        self.size = size
+        self.table = [None] * self.size
+        self.elementCount = 0
+
+    def isFull(self):
+        return self.elementCount == self.size
+
+    def hashFunction(self, element):
+        return element % self.size
+
+    def insert(self, record):
+        if self.isFull():
+            print("Hash Table Full")
+            return False
+
+        position = self.hashFunction(record.get_number())
+        comparisons = 1
+
+        while self.table[position] is not None:
+            position = (position + 1) % self.size
+            comparisons += 1
+
+        self.table[position] = record
+        self.elementCount += 1
+        print(f"Inserted {record.get_name()}'s number at position {position} with {comparisons} comparisons.")
+        return True
+
+    def search(self, record):
+        position = self.hashFunction(record.get_number())
+        comparisons = 1
+
+        while self.table[position] is not None:
+            if self.table[position].get_name() == record.get_name() and self.table[position].get_number() == record.get_number():
+                print(f"Found at position {position} with {comparisons} comparisons.")
+                return position
+            position = (position + 1) % self.size
+            comparisons += 1
+
+            if comparisons > self.size:
+                break
+
+        print("Record not found.")
+        return -1
+
+    def display(self):
+        print("\nHash Table:")
+        for i in range(self.size):
+            print(f"Index {i}: {self.table[i]}")
+        print(f"Total records: {self.elementCount}")
+
+
+class DoubleHashingHashTable:
+    def __init__(self, size, prime):
+        self.size = size
+        self.prime = prime
+        self.table = [None] * self.size
+        self.elementCount = 0
+
+    def isFull(self):
+        return self.elementCount == self.size
+
+    def h1(self, element):
+        return element % self.size
+
+    def h2(self, element):
+        return self.prime - (element % self.prime)
+
+    def insert(self, record):
+        if self.isFull():
+            print("Hash Table Full")
+            return False
+
+        position = self.h1(record.get_number())
+        step_size = self.h2(record.get_number())
+        comparisons = 1
+
+        while self.table[position] is not None:
+            position = (position + step_size) % self.size
+            comparisons += 1
+
+        self.table[position] = record
+        self.elementCount += 1
+        print(f"Inserted {record.get_name()}'s number at position {position} with {comparisons} comparisons.")
+        return True
+
+    def search(self, record):
+        position = self.h1(record.get_number())
+        step_size = self.h2(record.get_number())
+        comparisons = 1
+
+        while self.table[position] is not None:
+            if self.table[position].get_name() == record.get_name() and self.table[position].get_number() == record.get_number():
+                print(f"Found at position {position} with {comparisons} comparisons.")
+                return position
+            position = (position + step_size) % self.size
+            comparisons += 1
+
+            if comparisons > self.size:
+                break
+
+        print("Record not found.")
+        return -1
+
+    def display(self):
+        print("\nHash Table:")
+        for i in range(self.size):
+            print(f"Index {i}: {self.table[i]}")
+        print(f"Total records: {self.elementCount}")
+
+
+def input_record():
+    record = Record()
+    name = input("Enter Name: ")
+    number = int(input("Enter Number: "))
+    record.set_name(name)
+    record.set_number(number)
+    return record
+
+
+def main():
+    while True:
+        print("\n***** Telephone Book *****")
+        print("1. Linear Probing")
+        print("2. Double Hashing")
+        print("3. Exit")
+        choice1 = int(input("Enter Choice: "))
+
+        if choice1 == 1:
+            size = int(input("Enter hash table size: "))
+            h1 = LinearProbingHashTable(size)
+            while True:
+                print("\n1. Insert\n2. Search\n3. Display\n4. Back")
+                choice2 = int(input("Enter Choice: "))
+                if choice2 == 1:
+                    record = input_record()
+                    h1.insert(record)
+                elif choice2 == 2:
+                    record = input_record()
+                    h1.search(record)
+                elif choice2 == 3:
+                    h1.display()
+                elif choice2 == 4:
+                    break
+                else:
+                    print("Invalid choice.")
+        elif choice1 == 2:
+            size = int(input("Enter hash table size: "))
+            prime = int(input(f"Enter a prime number smaller than {size}: "))
+            h2 = DoubleHashingHashTable(size, prime)
+            while True:
+                print("\n1. Insert\n2. Search\n3. Display\n4. Back")
+                choice2 = int(input("Enter Choice: "))
+                if choice2 == 1:
+                    record = input_record()
+                    h2.insert(record)
+                elif choice2 == 2:
+                    record = input_record()
+                    h2.search(record)
+                elif choice2 == 3:
+                    h2.display()
+                elif choice2 == 4:
+                    break
+                else:
+                    print("Invalid choice.")
+        elif choice1 == 3:
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice.")
+
+
+if __name__ == "__main__":
+    main()
+
